@@ -27,9 +27,10 @@ func main() {
 
 	fmt.Println("drawio page size: ", drawioFile.Pages)
 
+	baseFileName := getFileNameWithoutExt(*fileName)
 	for i := 0; i < drawioFile.Pages; i++ {
 		pageNumber := strconv.Itoa(i + 1)
-		outputFileName := fmt.Sprintf("%s.png", pageNumber)
+		outputFileName := fmt.Sprintf("%s-%s.png", baseFileName, pageNumber)
 		cmd := exec.Command(drawioPath, "-x", "-f", "png", "-o", outputFileName, "-p", pageNumber, *fileName)
 		err = cmd.Run()
 		if err != nil {
