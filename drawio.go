@@ -21,6 +21,7 @@ type Diagram struct {
 	ID      string   `xml:"id,attr"`
 }
 
+// NewDrawioFile は、fileNameを開きDrawioFile構造体にマッピングする
 func NewDrawioFile(fileName string) (*DrawioFile, error) {
 	f, err := os.Open(fileName)
 	if err != nil {
@@ -42,6 +43,7 @@ func NewDrawioFile(fileName string) (*DrawioFile, error) {
 	return &drawioFile, nil
 }
 
+// chooseDrawioPath はOSに応じてdraw.ioの実行コマンドパスを切り替える
 func chooseDrawioPath() (string, error) {
 	if runtime.GOOS == "linux" {
 		return "drawio", nil
