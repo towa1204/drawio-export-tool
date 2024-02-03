@@ -7,9 +7,9 @@ Linux, Windows対応
 
 ## usage
 ```
-Usage of ./build/draw-export-linux-amd64:
+Usage of drawio-export:
   -f string
-        specify drawio filename (default "hoge.drawio")
+        specify drawio filename
   -o string
         specify output directory (default ".")
 ```
