@@ -1,7 +1,7 @@
 # Makefile
 
 # ターゲット名
-TARGET = draw-export
+TARGET = drawio-export
 
 # ソースコードのエントリーポイント
 SOURCE = .
