@@ -16,6 +16,7 @@ func run(args []string) int {
 	outDirName := commandLine.String("o", ".", "specify output directory")
 	if err := commandLine.Parse(args); err != nil {
 		fmt.Fprintf(os.Stderr, "cannot parse flags: %v\n", err)
+		return 1
 	}
 
 	if *fileName == "" {

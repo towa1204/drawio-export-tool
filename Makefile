@@ -30,7 +30,15 @@ windows:
 linux:
 	GOOS=linux GOARCH=amd64 go build $(BUILD_FLAGS) -o $(LINUX_TARGET) $(SOURCE)
 
+# buildファイル削除
 clean:
 	rm -rf $(OUTPUT_DIR)
 
-.PHONY: all windows linux clean
+test:
+	go test -v
+
+# テストで生成したエクスポートファイル削除
+test-clean:
+	rm -f *.png testdata/*.png
+
+.PHONY: all windows linux clean test test-clean
