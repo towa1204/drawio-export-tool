@@ -34,3 +34,13 @@ exported empty -> testdata/valid-3.png
 make clean && make all
 ```
 
+## test
+テスト実施
+```
+make test
+```
+
+テストで生成されたファイルの削除
+```
+make test-clean
+```
