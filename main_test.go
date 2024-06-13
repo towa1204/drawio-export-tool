@@ -5,6 +5,7 @@ import (
 	"testing"
 )
 
+// CLIのオプションと引数のテスト
 func TestOptionsArgument(t *testing.T) {
 	filePath := "testdata/valid.drawio"
 	tests := []struct {
@@ -13,8 +14,6 @@ func TestOptionsArgument(t *testing.T) {
 		want int
 	}{
 		// 正常系
-		// {name: "-h", args: []string{"-h"}, want: 0},
-		// {name: "--help", args: []string{"--help"}, want: 0},
 		{name: "-f only", args: []string{"-f", filePath}, want: 0},
 		{name: "-o ./testdata", args: []string{"-f", filePath, "-o", "./testdata"}, want: 0},
 		// 異常系
