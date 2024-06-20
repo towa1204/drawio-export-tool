@@ -8,8 +8,6 @@ Linux, Windows対応
 ## usage
 ```
 Usage of drawio-export:
-  -f string
-        specify drawio filename
   -o string
         specify output directory (default ".")
 ```
@@ -17,11 +15,7 @@ Usage of drawio-export:
 ## example
 
 ```txt
-$ ./build/drawio-export-linux-amd64 -f testdata/valid.drawio -o testdata/
-drawio page size:  3
-exported drawio-export-tool -> testdata/valid-1.png
-exported 花 -> testdata/valid-2.png
-exported empty -> testdata/valid-3.png
+$ ./build/drawio-export-linux-amd64 -o testdata/ testdata/valid.drawio  testdata/valid2
 ```
 
 ## build
