@@ -14,11 +14,11 @@ func TestOptionsArgument(t *testing.T) {
 		want int
 	}{
 		// 正常系
-		{name: "-f only", args: []string{"-f", filePath}, want: 0},
-		{name: "-o ./testdata", args: []string{"-f", filePath, "-o", "./testdata"}, want: 0},
+		{name: "no options", args: []string{filePath}, want: 0},
+		{name: "-o ./testdata", args: []string{"-o", "./testdata", filePath}, want: 0},
 		// 異常系
-		{name: "no options", args: nil, want: 1},
-		{name: "no -f options", args: []string{"-o", "."}, want: 1},
+		{name: "no argment", args: nil, want: 1},
+		{name: "no file", args: []string{"-o", "."}, want: 1},
 	}
 
 	for _, tt := range tests {
@@ -41,10 +41,10 @@ func TestImportFile(t *testing.T) {
 		want int
 	}{
 		// 正常系
-		{name: "-o ./testdata", args: []string{"-f", nonExtensionfile, "-o", "./testdata"}, want: 0},
+		{name: "-o ./testdata", args: []string{"-o", "./testdata", nonExtensionfile}, want: 0},
 		// 異常系
-		{name: "non-existent file", args: []string{"-f", nonExistentFile, "-o", "./testdata"}, want: 1},
-		{name: "non-existent file", args: []string{"-f", invalidFile, "-o", "./testdata"}, want: 1},
+		{name: "non-existent file", args: []string{"-o", "./testdata", nonExistentFile}, want: 1},
+		{name: "non-existent file", args: []string{"-o", "./testdata", invalidFile}, want: 1},
 	}
 
 	for _, tt := range tests {

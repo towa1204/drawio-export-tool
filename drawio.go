@@ -43,8 +43,8 @@ func NewDrawioFile(fileName string) (*DrawioFile, error) {
 	return &drawioFile, nil
 }
 
-// getDrawioExecutablePath はOSに応じてdrawioの実行コマンドパスを切り替える
-func getDrawioExecutablePath() (string, error) {
+// GetDrawioExecutablePath はOSに応じてdrawioの実行コマンドパスを切り替える
+func GetDrawioExecutablePath() (string, error) {
 	if runtime.GOOS == "linux" {
 		return "drawio", nil
 	} else if runtime.GOOS == "windows" {

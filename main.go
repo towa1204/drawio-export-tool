@@ -7,56 +7,95 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strconv"
+
+	"golang.org/x/sync/errgroup"
 )
 
 var commandLine = flag.NewFlagSet("drawio-export", flag.ExitOnError)
 
 func run(args []string) int {
-	fileName := commandLine.String("f", "", "specify drawio filename")
 	outDirName := commandLine.String("o", ".", "specify output directory")
 	if err := commandLine.Parse(args); err != nil {
 		fmt.Fprintf(os.Stderr, "cannot parse flags: %v\n", err)
 		return 1
 	}
 
-	if *fileName == "" {
+	fileNames := commandLine.Args()
+	if len(fileNames) == 0 {
 		fmt.Fprintln(os.Stderr, "filename must be provided")
 		return 1
 	}
+
 	if !isExistDir(*outDirName) {
 		fmt.Fprintln(os.Stderr, "invalid directory")
 		return 1
 	}
 
-	drawioPath, err := getDrawioExecutablePath()
+	drawioPath, err := GetDrawioExecutablePath()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "unsupported OS: %v\n", err)
 		return 1
 	}
 
-	drawioFile, err := NewDrawioFile(*fileName)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "failed to parse %s: %v\n", *fileName, err)
+	// ファイルごとに全ページエクスポートを実行
+	// 【エラーハンドリングの方針】
+	// ・エクスポートに失敗したページがあっても継続する
+	// ・失敗したページは標準エラー出力先に出力する
+	// ・1つでも失敗したページがあれば、終了ステータスは1にする
+	errFlg := false
+	for _, fileName := range fileNames {
+		fileName := fileName
+		err := ExportAllPage(drawioPath, fileName, *outDirName)
+		if err != nil {
+			errFlg = true
+		}
+	}
+
+	if errFlg {
 		return 1
 	}
-
-	fmt.Println("drawio page size: ", drawioFile.Pages)
-
-	baseFileName := removeExtension(*fileName)
-	for i := 0; i < drawioFile.Pages; i++ {
-		pageNumber := strconv.Itoa(i)
-		outFileName := filepath.Join(*outDirName, fmt.Sprintf("%s-%d.png", baseFileName, i+1))
-
-		cmd := exec.Command(drawioPath, "-x", "-f", "png", "-o", outFileName, "-p", pageNumber, *fileName)
-		err := cmd.Run()
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "[page-number %s] failed to export: %v\n", pageNumber, err)
-			return 1
-		}
-
-		fmt.Printf("exported %s -> %s\n", drawioFile.Diagrams[i].Name, outFileName)
-	}
 	return 0
+}
+
+// 指定ファイルの全ページをpngエクスポート
+func ExportAllPage(drawioPath, fileName, outDirName string) error {
+	drawioFile, err := NewDrawioFile(fileName)
+	if err != nil {
+		message := fmt.Sprintf("failed to parse %s: %v", fileName, err)
+		fmt.Fprintln(os.Stderr, message)
+		return fmt.Errorf(message)
+	}
+
+	// fmt.Println("drawio page size: ", drawioFile.Pages)
+
+	var eg errgroup.Group
+	eg.SetLimit(10)
+
+	baseFileName := removeExtension(fileName)
+	for i := 0; i < drawioFile.Pages; i++ {
+		i := i
+		eg.Go(func() error {
+			pageNumber := strconv.Itoa(i)
+			outFileName := filepath.Join(outDirName, fmt.Sprintf("%s-%d.png", baseFileName, i+1))
+
+			cmd := exec.Command(drawioPath, "-x", "-f", "png", "-o", outFileName, "-p", pageNumber, fileName)
+			err := cmd.Run()
+			if err != nil {
+				pageName := drawioFile.Diagrams[i].Name
+				message := fmt.Sprintf("failed to export %s %s: %v", fileName, pageName, err)
+				fmt.Fprintln(os.Stderr, message)
+				return fmt.Errorf(message)
+			}
+
+			// fmt.Printf("exported %s -> %s\n", drawioFile.Diagrams[i].Name, outFileName)
+			return nil
+		})
+	}
+
+	if err := eg.Wait(); err != nil {
+		return err
+	}
+	return nil
 }
 
 func main() {
