@@ -62,6 +62,6 @@ func BenchmarkRun(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		commandLine = flag.NewFlagSet("drawio-export", flag.ExitOnError)
-		run([]string{"-f", filePath, "-o", "./testdata"})
+		run([]string{"-o", "./testdata", filePath})
 	}
 }
