@@ -15,6 +15,7 @@ var commandLine = flag.NewFlagSet("drawio-export", flag.ExitOnError)
 
 func run(args []string) int {
 	outDirName := commandLine.String("o", ".", "specify output directory")
+	skipOption := commandLine.Bool("s", false, "skip export same name file")
 	if err := commandLine.Parse(args); err != nil {
 		fmt.Fprintf(os.Stderr, "cannot parse flags: %v\n", err)
 		return 1
@@ -45,7 +46,7 @@ func run(args []string) int {
 	errFlg := false
 	for _, fileName := range fileNames {
 		fileName := fileName
-		err := ExportAllPage(drawioPath, fileName, *outDirName)
+		err := ExportAllPage(drawioPath, fileName, *outDirName, *skipOption)
 		if err != nil {
 			errFlg = true
 		}
@@ -58,7 +59,7 @@ func run(args []string) int {
 }
 
 // 指定ファイルの全ページをpngエクスポート
-func ExportAllPage(drawioPath, fileName, outDirName string) error {
+func ExportAllPage(drawioPath, fileName, outDirName string, skipOption bool) error {
 	drawioFile, err := NewDrawioFile(fileName)
 	if err != nil {
 		message := fmt.Sprintf("failed to parse %s: %v", fileName, err)
@@ -75,13 +76,18 @@ func ExportAllPage(drawioPath, fileName, outDirName string) error {
 	for i := 0; i < drawioFile.Pages; i++ {
 		i := i
 		eg.Go(func() error {
+			pageName := drawioFile.Diagrams[i].Name
 			pageNumber := strconv.Itoa(i)
 			outFileName := filepath.Join(outDirName, fmt.Sprintf("%s-%d.png", baseFileName, i+1))
+
+			if skipOption && isExistFile(outFileName) {
+				fmt.Printf("skip export %s %s\n", fileName, pageName)
+				return nil
+			}
 
 			cmd := exec.Command(drawioPath, "-x", "-f", "png", "-o", outFileName, "-p", pageNumber, fileName)
 			err := cmd.Run()
 			if err != nil {
-				pageName := drawioFile.Diagrams[i].Name
 				message := fmt.Sprintf("failed to export %s %s: %v", fileName, pageName, err)
 				fmt.Fprintln(os.Stderr, message)
 				return fmt.Errorf(message)

@@ -26,3 +26,9 @@ func isExistDir(dirName string) bool {
 
 	return false
 }
+
+// isExistFile は与えられた文字列がファイルとして存在するか判定する
+func isExistFile(fileName string) bool {
+	_, err := os.Stat(fileName)
+	return err == nil
+}
