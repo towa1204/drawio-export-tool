@@ -6,19 +6,21 @@ import (
 )
 
 // CLIのオプションと引数のテスト
-func TestOptionsArgument(t *testing.T) {
+func Testオプション(t *testing.T) {
 	filePath := "testdata/valid.drawio"
+	filePath2 := "testdata/valid2"
 	tests := []struct {
 		name string
 		args []string
 		want int
 	}{
 		// 正常系
-		{name: "no options", args: []string{filePath}, want: 0},
-		{name: "-o ./testdata", args: []string{"-o", "./testdata", filePath}, want: 0},
+		{name: "-oオプションなし->正常終了", args: []string{filePath}, want: 0},
+		{name: "-oオプションあり->正常終了", args: []string{"-o", "./testdata", filePath}, want: 0},
+		{name: "複数ファイル指定->正常終了", args: []string{"-o", "./testdata", filePath, filePath2}, want: 0},
 		// 異常系
-		{name: "no argment", args: nil, want: 1},
-		{name: "no file", args: []string{"-o", "."}, want: 1},
+		{name: "引数指定なし->異常終了", args: nil, want: 1},
+		{name: "ファイル指定なし->異常終了", args: []string{"-o", "."}, want: 1},
 	}
 
 	for _, tt := range tests {
@@ -31,7 +33,7 @@ func TestOptionsArgument(t *testing.T) {
 	}
 }
 
-func TestImportFile(t *testing.T) {
+func Testファイル読み込み(t *testing.T) {
 	nonExtensionfile := "testdata/valid2"
 	nonExistentFile := "testdata/non-existent.drawio"
 	invalidFile := "testdata/invalid.drawio"
@@ -41,10 +43,10 @@ func TestImportFile(t *testing.T) {
 		want int
 	}{
 		// 正常系
-		{name: "-o ./testdata", args: []string{"-o", "./testdata", nonExtensionfile}, want: 0},
+		{name: "拡張子なしのファイル指定 -> 正常終了", args: []string{"-o", "./testdata", nonExtensionfile}, want: 0},
 		// 異常系
-		{name: "non-existent file", args: []string{"-o", "./testdata", nonExistentFile}, want: 1},
-		{name: "non-existent file", args: []string{"-o", "./testdata", invalidFile}, want: 1},
+		{name: "存在しないファイル指定 -> 異常終了", args: []string{"-o", "./testdata", nonExistentFile}, want: 1},
+		{name: "無効なファイル指定 -> 異常終了", args: []string{"-o", "./testdata", invalidFile}, want: 1},
 	}
 
 	for _, tt := range tests {
