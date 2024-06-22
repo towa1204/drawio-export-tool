@@ -10,6 +10,7 @@ Linux, Windows対応
 Usage of drawio-export:
   -o string
         specify output directory (default ".")
+  -s    skip export same name file
 ```
 
 ## example
