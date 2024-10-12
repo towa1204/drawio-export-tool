@@ -14,7 +14,7 @@ Usage of drawio-export:
 ```
 
 ## example
-
+2つのdrawioファイル（valid.drawio,valid2)を`testdata/`にエクスポート
 ```txt
 $ ./build/drawio-export-linux-amd64 -o testdata/ testdata/valid.drawio  testdata/valid2
 ```
