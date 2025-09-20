@@ -28,7 +28,7 @@ func run(args []string) int {
 	}
 
 	if !isExistDir(*outDirName) {
-		fmt.Fprintln(os.Stderr, "invalid directory")
+		fmt.Fprintf(os.Stderr, "invalid output directory: %v\n", *outDirName)
 		return 1
 	}
 
@@ -67,7 +67,7 @@ func ExportAllPage(drawioPath, fileName, outDirName string, skipOption bool) err
 		return fmt.Errorf(message)
 	}
 
-	// fmt.Println("drawio page size: ", drawioFile.Pages)
+	fmt.Printf("### file:%s size:%d ### \n", fileName, drawioFile.Pages)
 
 	var eg errgroup.Group
 	eg.SetLimit(10)
@@ -78,7 +78,7 @@ func ExportAllPage(drawioPath, fileName, outDirName string, skipOption bool) err
 		eg.Go(func() error {
 			pageName := drawioFile.Diagrams[i].Name
 			pageNumber := strconv.Itoa(i)
-			outFileName := filepath.Join(outDirName, fmt.Sprintf("%s-%d.png", baseFileName, i+1))
+			outFileName := filepath.Join(outDirName, fmt.Sprintf("%s_%d_%s.png", baseFileName, i+1, pageName))
 
 			if skipOption && isExistFile(outFileName) {
 				fmt.Printf("skip export %s %s\n", fileName, pageName)
@@ -93,7 +93,7 @@ func ExportAllPage(drawioPath, fileName, outDirName string, skipOption bool) err
 				return fmt.Errorf(message)
 			}
 
-			// fmt.Printf("exported %s -> %s\n", drawioFile.Diagrams[i].Name, outFileName)
+			fmt.Printf("exported %s -> %s\n", drawioFile.Diagrams[i].Name, outFileName)
 			return nil
 		})
 	}
